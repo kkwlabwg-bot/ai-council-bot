@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+line-bot-sdk>=3.11
+aiohttp
+tenacity
+cachetools
+duckduckgo-search
