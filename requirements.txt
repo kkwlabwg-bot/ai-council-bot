@@ -1,7 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 line-bot-sdk>=3.11
 aiohttp
 tenacity
 cachetools
-duckduckgo-search
+feedparser
+trafilatura
+google-generativeai
