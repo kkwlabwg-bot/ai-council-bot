@@ -178,3 +178,16 @@ async def view_answer(id: str):
     data = answer_store.get(id)
     if not data: return HTMLResponse("<h2>⏳ ลิงก์หมดอายุแล้ว</h2>", 404)
     return HTMLResponse(f"<html><body style='font-family:sans-serif;padding:20px;max-width:900px;margin:auto;'><pre style='white-space:pre-wrap;background:#f9f9f9;padding:20px;border-radius:8px;'>{html.escape(data['text'])}</pre></body></html>")
+@app.post("/callback")
+async def webhook(request: Request, x_line_signature: str = Header(None)):
+    try:
+        body = (await request.body()).decode()
+        events = wh_parser.parse(body, x_line_signature)
+        for event in events:
+            if isinstance(event, MessageEvent) and isinstance(event.message, TextMessageContent):
+                uid = getattr(event.source, "user_id", None)
+                if uid: asyncio.create_task(process_message(event.reply_token, uid, event.message.text))
+        return Response("OK", 200)
+    except Exception as e:
+        log.error(f"❌ แจ้งเตือน Webhook พัง: {e}") # <--- จุดนี้ที่จะทำให้เรารู้ความจริง!
+        return Response("OK", 200)
